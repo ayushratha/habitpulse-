@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HabitPulse - Modern Daily Habit Tracker & Analytics</title>
+  <meta name="description" content="Build consistency, track daily habits, and measure weekly progress with an elegant, responsive habit tracking dashboard.">
+  
+  <!-- Modern Typography (Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Chart.js & Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-wrapper">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-info">
+          <h1>HabitPulse</h1>
+          <span>Consistency Engine</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-link active" data-view="dashboard" id="nav-dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>Dashboard</span>
+        </button>
+
+        <button class="nav-link" data-view="habits" id="nav-habits">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><circle cx="7" cy="7" r=".5" fill="currentColor"/></svg>
+          <span>Daily Habits</span>
+        </button>
+
+        <button class="nav-link" data-view="weekly" id="nav-weekly">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+          <span>Weekly Progress</span>
+        </button>
+
+        <button class="nav-link" data-view="calendar" id="nav-calendar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          <span>Calendar</span>
+        </button>
+
+        <button class="nav-link" data-view="analytics" id="nav-analytics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          <span>Analytics</span>
+        </button>
+
+        <button class="nav-link" data-view="settings" id="nav-settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark / Light Theme">
+          <div class="theme-toggle-icon">
+            <span id="themeIcon">🌙</span>
+            <span id="themeLabel">Dark Mode</span>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Switch</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+      <!-- Top Dynamic Header -->
+      <header class="top-header">
+        <div class="page-title-group">
+          <h2 id="currentViewTitle">Dashboard</h2>
+          <p class="page-subtitle" id="currentViewSubtitle">Track your daily execution and consistency.</p>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn btn-outline" id="headerDateDisplayBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <span id="headerTodayDate">Loading...</span>
+          </button>
+          <button class="btn btn-primary" id="openAddHabitModalBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+            <span>New Habit</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section class="view-panel" id="view-dashboard">
+        <!-- Motivational Hero Banner with Progress Ring -->
+        <div class="hero-banner">
+          <div class="hero-content">
+            <div class="hero-date-badge" id="heroBadge">
+              <span>✨</span>
+              <span id="heroDateText">Today's Focus</span>
+            </div>
+            <h3 class="hero-quote" id="motivationalQuote">"A fresh canvas awaits. Complete your first habit of the day!"</h3>
+            <p class="hero-sub" id="motivationalSub">Stay committed to the daily compound effect.</p>
+          </div>
+
+          <!-- Circular SVG Progress Ring -->
+          <div class="progress-ring-container">
+            <svg class="progress-ring-svg" width="130" height="130" viewBox="0 0 130 130">
+              <circle class="progress-ring-bg" cx="65" cy="65" r="54"></circle>
+              <circle class="progress-ring-circle" id="dashboardProgressCircle" cx="65" cy="65" r="54" stroke-dasharray="339.29" stroke-dashoffset="339.29"></circle>
+            </svg>
+            <div class="progress-ring-text">
+              <span class="progress-ring-percentage" id="dashboardRingPercent">0%</span>
+              <span class="progress-ring-label" id="dashboardRingLabel">Completed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(255, 110, 84, 0.14); color: #FF6E54;">📋</div>
+            <div class="metric-info">
+              <span class="metric-label">Total Habits</span>
+              <span class="metric-value" id="metricTotalHabits">0</span>
+              <span class="metric-sub">Active routines</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(34, 197, 94, 0.12); color: #22C55E;">✅</div>
+            <div class="metric-info">
+              <span class="metric-label">Done Today</span>
+              <span class="metric-value" id="metricDoneToday">0 / 0</span>
+              <span class="metric-sub" id="metricDailyPct">0% completion</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.12); color: #F59E0B;">🔥</div>
+            <div class="metric-info">
+              <span class="metric-label">Current Streak</span>
+              <span class="metric-value" id="metricCurrentStreak">0 Days</span>
+              <span class="metric-sub" id="metricBestStreak">Best: 0 Days</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon-box" style="background: rgba(6, 182, 212, 0.12); color: #06B6D4;">📈</div>
+            <div class="metric-info">
+              <span class="metric-label">Weekly Progress</span>
+              <span class="metric-value" id="metricWeeklyProgress">0%</span>
+              <span class="metric-sub" id="metricWeeklyCompletions">0 scheduled done</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Habits Quick Checklist -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Today's Habits Checklist</h3>
+              <p class="card-subtitle">Mark habits as complete or adjust counts in real-time</p>
+            </div>
+            <div class="category-filters" id="dashboardCategoryFilters">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div class="habits-list" id="dashboardHabitsList">
+            <!-- Habit cards rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Quick Weekly Chart Overview -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">This Week's Daily Consistency</h3>
+              <p class="card-subtitle">Monday through Sunday performance</p>
+            </div>
+            <button class="btn btn-outline" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="App.navigateTo('weekly')">View Full Matrix →</button>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="weeklyProgressChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: DAILY HABITS (Dedicated tracking & management) -->
+      <section class="view-panel" id="view-habits" style="display: none;">
+        <div class="section-toolbar">
+          <div class="date-navigator">
+            <button class="btn btn-outline btn-icon-only" id="prevDayBtn" title="Previous Day">‹</button>
+            <button class="date-display-btn" id="activeDateDisplay">Today</button>
+            <input type="date" id="datePickerInput" style="display: none;">
+            <button class="btn btn-outline btn-icon-only" id="nextDayBtn" title="Next Day">›</button>
+            <button class="btn btn-outline" id="jumpToTodayBtn" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">Today</button>
+          </div>
+
+          <div class="category-filters" id="habitsCategoryFilters">
+            <!-- Category pills -->
+          </div>
+        </div>
+
+        <div class="habits-list" id="dailyChecklistContainer">
+          <!-- Habit checklist items -->
+        </div>
+      </section>
+
+      <!-- VIEW 3: WEEKLY PROGRESS -->
+      <section class="view-panel" id="view-weekly" style="display: none;">
+        <div class="weekly-nav-header">
+          <div class="week-selector">
+            <button class="btn btn-outline btn-icon-only" id="prevWeekBtn">‹</button>
+            <span class="week-label" id="currentWeekRangeLabel">This Week</span>
+            <button class="btn btn-outline btn-icon-only" id="nextWeekBtn">›</button>
+            <button class="btn btn-outline" id="currentWeekBtn" style="font-size: 0.8rem; padding: 0.3rem 0.65rem;">Current Week</button>
+          </div>
+
+          <div class="header-actions">
+            <span class="category-tag" id="weekOverWeekBadge" style="background: var(--color-success-light); color: var(--color-success);">
+              +0% vs last week
+            </span>
+          </div>
+        </div>
+
+        <!-- Weekly summary stat blocks -->
+        <div class="weekly-stats-bar">
+          <div class="weekly-stat-card">
+            <span class="stat-title">Weekly Completion</span>
+            <span class="stat-big" id="weeklyCompletionPct">0%</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">of scheduled instances</span>
+          </div>
+
+          <div class="weekly-stat-card">
+            <span class="stat-title">Total Completed</span>
+            <span class="stat-big" id="weeklyTotalCompletedCount">0</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Habit checks this week</span>
+          </div>
+
+          <div class="weekly-stat-card">
+            <span class="stat-title">Best Performer</span>
+            <span class="stat-big" id="weeklyBestHabit" style="font-size: 1.25rem;">—</span>
+            <span style="font-size: 0.75rem; color: var(--color-success); margin-top: 0.2rem;" id="weeklyBestHabitRate">100% adherence</span>
+          </div>
+
+          <div class="weekly-stat-card">
+            <span class="stat-title">Least Consistent</span>
+            <span class="stat-big" id="weeklyLeastHabit" style="font-size: 1.25rem;">—</span>
+            <span style="font-size: 0.75rem; color: var(--color-warning); margin-top: 0.2rem;" id="weeklyLeastHabitRate">Needs attention</span>
+          </div>
+        </div>
+
+        <!-- Habits vs Days Matrix Grid Table -->
+        <div class="table-responsive" style="margin-bottom: 2rem;">
+          <table class="weekly-matrix-table" id="weeklyMatrixTable">
+            <thead>
+              <tr id="weeklyMatrixHeaderRow">
+                <th class="habit-col">Habit Routine</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+                <th>Weekly Rate</th>
+              </tr>
+            </thead>
+            <tbody id="weeklyMatrixTableBody">
+              <!-- Rows populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Weekly Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Daily Performance Comparison</h3>
+              <p class="card-subtitle">Completed instances across the selected week</p>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="weeklyBarDetailChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: CALENDAR VIEW -->
+      <section class="view-panel" id="view-calendar" style="display: none;">
+        <div class="calendar-container">
+          <div class="calendar-header">
+            <div class="week-selector">
+              <button class="btn btn-outline btn-icon-only" id="prevMonthBtn">‹</button>
+              <h3 class="calendar-month-title" id="calendarMonthYearTitle">Month 2026</h3>
+              <button class="btn btn-outline btn-icon-only" id="nextMonthBtn">›</button>
+              <button class="btn btn-outline" id="todayMonthBtn" style="font-size: 0.8rem; padding: 0.3rem 0.65rem;">Today</button>
+            </div>
+
+            <div style="display: flex; gap: 0.65rem; align-items: center; font-size: 0.75rem; font-weight: 700;">
+              <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--color-success);"></span> 100% Done</span>
+              <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--color-warning);"></span> Partial</span>
+              <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--border-color);"></span> 0% Done</span>
+            </div>
+          </div>
+
+          <div class="calendar-grid">
+            <div class="calendar-day-header">Mon</div>
+            <div class="calendar-day-header">Tue</div>
+            <div class="calendar-day-header">Wed</div>
+            <div class="calendar-day-header">Thu</div>
+            <div class="calendar-day-header">Fri</div>
+            <div class="calendar-day-header">Sat</div>
+            <div class="calendar-day-header">Sun</div>
+          </div>
+
+          <div class="calendar-grid" id="calendarDaysGrid" style="margin-top: 0.5rem;">
+            <!-- Rendered 35/42 cells via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: PROGRESS ANALYTICS -->
+      <section class="view-panel" id="view-analytics" style="display: none;">
+        <div class="analytics-grid">
+          <!-- 14-Day Completion Trend Line Chart -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">14-Day Completion Trend</h3>
+                <p class="card-subtitle">Consistency trajectory over time</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="analyticsTrendChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Category Breakdown Donut Chart -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Category Completion Distribution</h3>
+                <p class="card-subtitle">Habits completed by life category</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="categoryDonutChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard & Streaks Table -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Habit Consistency Leaderboard</h3>
+              <p class="card-subtitle">Current streaks, records, and overall adherence rate</p>
+            </div>
+          </div>
+
+          <div class="leaderboard-list" id="analyticsLeaderboardList">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: SETTINGS & BACKUP -->
+      <section class="view-panel" id="view-settings" style="display: none;">
+        <div class="settings-section">
+          <!-- User Profile & Target -->
+          <div class="settings-card">
+            <h3 class="card-title" style="margin-bottom: 1rem;">Habit Preferences</h3>
+            <form id="settingsForm">
+              <div class="form-group">
+                <label class="form-label" for="settingUserName">Your Name</label>
+                <input type="text" id="settingUserName" class="form-input" placeholder="Achiever">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingTargetRate">Target Weekly Completion Rate (%)</label>
+                <input type="number" id="settingTargetRate" class="form-input" min="10" max="100" step="5" value="80">
+              </div>
+
+              <div class="form-group" style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <div>
+                  <div class="form-label">Confetti Celebration</div>
+                  <div style="font-size: 0.775rem; color: var(--text-muted);">Celebrate when all habits for the day are finished</div>
+                </div>
+                <input type="checkbox" id="settingConfetti" checked style="width: 20px; height: 20px; accent-color: var(--color-primary);">
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="margin-top: 1.25rem;">Save Preferences</button>
+            </form>
+          </div>
+
+          <!-- Backup & Restore -->
+          <div class="settings-card">
+            <h3 class="card-title" style="margin-bottom: 0.5rem;">Data Management & Backups</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              All data is stored directly in your browser's localStorage. Export a backup or import on another device.
+            </p>
+
+            <div class="backup-actions-row">
+              <button class="btn btn-outline" id="exportDataBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                <span>Export Data (JSON)</span>
+              </button>
+
+              <label class="btn btn-outline" style="cursor: pointer;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <span>Import Backup</span>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;">
+              </label>
+
+              <button class="btn btn-outline" id="clearLogsBtn" title="Clear all recorded history while keeping your habits">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Clear Activity History</span>
+              </button>
+
+              <button class="btn btn-danger-outline" id="resetDataBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                <span>Reset to Defaults</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-nav" id="mobileNav">
+      <button class="mobile-nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <span>Home</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="habits">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/></svg>
+        <span>Habits</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="weekly">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+        <span>Weekly</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="calendar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        <span>Calendar</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        <span>Insights</span>
+      </button>
+
+      <button class="mobile-nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ADD / EDIT HABIT MODAL -->
+  <dialog class="custom-modal" id="habitModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="habitModalTitle">Create New Habit</h3>
+        <button class="close-btn" id="closeHabitModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form id="habitForm">
+        <input type="hidden" id="habitFormId">
+
+        <div class="form-group">
+          <label class="form-label" for="habitNameInput">Habit Name *</label>
+          <input type="text" id="habitNameInput" class="form-input" placeholder="e.g. Morning Jog, Read 20 Pages" required maxlength="40">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Icon / Emoji</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" id="habitEmojiInput" class="form-input" style="width: 60px; text-align: center; font-size: 1.4rem;" value="⭐" maxlength="2">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Pick from presets or type any emoji:</span>
+          </div>
+          <div class="emoji-selector-grid" id="emojiSelectorGrid">
+            <!-- Preset emoji pills -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="habitCategorySelect">Category</label>
+          <select id="habitCategorySelect" class="form-select">
+            <option value="Health">Health</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Education">Education</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Personal Development">Personal Development</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="habitTypeSelect">Tracking Type</label>
+          <select id="habitTypeSelect" class="form-select">
+            <option value="binary">Simple Checkbox (Done / Not Done)</option>
+            <option value="counter">Numerical Counter (e.g. 8 glasses water)</option>
+            <option value="duration">Duration Tracker (e.g. 30 mins study/workout)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="targetValueGroup" style="display: none;">
+          <label class="form-label" id="targetValueLabel">Daily Target Value</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="number" id="habitTargetValueInput" class="form-input" min="1" max="1000" value="8">
+            <input type="text" id="habitUnitInput" class="form-input" style="width: 120px;" placeholder="glasses / mins">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="habitFrequencySelect">Target Frequency</label>
+          <div style="display: flex; gap: 0.75rem;">
+            <select id="habitFrequencySelect" class="form-select" style="flex: 1;">
+              <option value="daily">Every Day (7 days/week)</option>
+              <option value="weekly">Custom Days per Week</option>
+            </select>
+            <input type="number" id="habitWeeklyDaysInput" class="form-input" style="width: 90px; display: none;" min="1" max="7" value="5" title="Days per week">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" id="cancelHabitBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveHabitBtn">Save Habit</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- CALENDAR DAY DETAIL MODAL -->
+  <dialog class="custom-modal" id="dayDetailModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="dayDetailDateTitle">October 25, 2026</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);" id="dayDetailSub">Daily Habit Review & Edit</p>
+        </div>
+        <button class="close-btn" id="closeDayDetailModalBtn">&times;</button>
+      </div>
+
+      <div class="habits-list" id="dayDetailHabitsList" style="max-height: 420px; overflow-y: auto; padding-right: 0.25rem;">
+        <!-- Day habit checklist -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+        <button class="btn btn-primary" id="doneDayDetailBtn">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- CONFIRM ACTION MODAL -->
+  <dialog class="custom-modal" id="confirmModal">
+    <div class="modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="confirmModalTitle">Are you sure?</h3>
+        <button class="close-btn" id="closeConfirmModalBtn">&times;</button>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;" id="confirmModalMessage">
+        This action cannot be undone.
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button class="btn btn-outline" id="cancelConfirmBtn">Cancel</button>
+        <button class="btn btn-danger-outline" id="proceedConfirmBtn" style="background: var(--color-danger); color: #fff;">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
